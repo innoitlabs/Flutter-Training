@@ -645,4 +645,11 @@ Upon completion, students will be proficient in:
 
 ---
 
+## Commands
+
+flutter create .
+flutter create --platforms=ios .
+flutter create --platforms=android .
+flutter run -d "iPhone 16 Pro"
+
 *This curriculum is designed to provide a comprehensive learning path from beginner to advanced Flutter development. Each module builds upon previous knowledge, ensuring a solid foundation for building production-ready mobile applications.*

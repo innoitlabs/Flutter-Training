@@ -1,0 +1,139 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# Android signing files - NEVER COMMIT THESE
+android/key.properties
+android/app/keystore.jks
+android/app/*.keystore
+android/app/*.jks
+
+# iOS signing files - NEVER COMMIT THESE
+ios/Runner/DistributionSummary.plist
+ios/Runner/ExportOptions.plist
+ios/Runner/ProvisioningProfiles/
+ios/Runner/*.p12
+ios/Runner/*.mobileprovision
+
+# Fastlane
+ios/fastlane/report.xml
+ios/fastlane/Preview.html
+ios/fastlane/screenshots
+ios/fastlane/test_output
+
+# Firebase
+google-services.json
+GoogleService-Info.plist
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.staging
+.env.production
+
+# Coverage reports
+coverage/
+*.lcov
+
+# Test outputs
+test-results/
+junit.xml
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Node modules (if using any Node.js tools)
+node_modules/
+
+# Python virtual environments
+venv/
+env/
+
+# Local configuration files
+local.properties
+local_config.dart
+
+# Generated files
+*.g.dart
+*.freezed.dart
+*.mocks.dart
+
+# Build outputs
+build/
+dist/
+out/
+
+# Logs
+logs/
+*.log
+
+# IDE specific files
+.vscode/settings.json
+.vscode/launch.json
+.vscode/tasks.json
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*

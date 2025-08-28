@@ -1,0 +1,29 @@
+name: device_hub
+description: A Flutter app demonstrating native platform integration with camera, location, and permissions.
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.6.1 <4.0.0'
+  flutter: ">=3.24.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # Native platform integration packages
+  camera: ^0.11.0+1
+  geolocator: ^12.0.0
+  permission_handler: ^11.3.1
+  
+  # UI and utilities
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true

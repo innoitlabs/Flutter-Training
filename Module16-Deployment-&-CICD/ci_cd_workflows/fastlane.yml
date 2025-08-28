@@ -1,0 +1,323 @@
+name: Fastlane iOS Deployment
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'ios/**'
+      - 'lib/**'
+      - 'pubspec.yaml'
+  workflow_dispatch:
+    inputs:
+      lane:
+        description: 'Fastlane lane to run'
+        required: true
+        default: 'beta'
+        type: choice
+        options:
+        - beta
+        - release
+        - testflight
+
+jobs:
+  fastlane-ios:
+    name: Fastlane iOS
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+          
+      - name: Get dependencies
+        run: flutter pub get
+        
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: 'latest-stable'
+          
+      - name: Install Fastlane
+        run: |
+          gem install fastlane
+          
+      - name: Setup Code Signing
+        uses: apple-actions/import-codesigning-certs@v1
+        with:
+          p12-file-base64: ${{ secrets.IOS_P12_BASE64 }}
+          p12-password: ${{ secrets.IOS_P12_PASSWORD }}
+          
+      - name: Install Provisioning Profile
+        run: |
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | base64 -d > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
+          
+      - name: Build Flutter iOS
+        run: flutter build ios --release
+        
+      - name: Run Fastlane
+        run: |
+          cd ios
+          fastlane ${{ github.event.inputs.lane || 'beta' }}
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
+          FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
+          FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
+          FASTLANE_SESSION: ${{ secrets.FASTLANE_SESSION }}
+
+# Fastlane Configuration Files
+
+# ios/fastlane/Fastfile
+# This file contains the lane definitions for iOS deployment
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Push a new beta build to TestFlight"
+  lane :beta do
+    setup_ci if is_ci
+    
+    # Ensure we're on the right branch
+    ensure_git_branch(branch: 'main')
+    
+    # Increment build number
+    increment_build_number(
+      build_number: latest_testflight_build_number + 1,
+      xcodeproj: "Runner.xcodeproj"
+    )
+    
+    # Build the app
+    build_ios_app(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "app-store",
+      export_options: {
+        method: "app-store",
+        provisioningProfiles: {
+          "com.example.deploymentDemoApp" => "match AppStore com.example.deploymentDemoApp"
+        }
+      },
+      output_directory: "build/ios",
+      output_name: "DeploymentDemo.ipa",
+      clean: true,
+      archive_path: "build/ios/DeploymentDemo.xcarchive"
+    )
+    
+    # Upload to TestFlight
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+      changelog: "Beta build #{latest_testflight_build_number + 1}"
+    )
+    
+    # Notify team
+    slack(
+      message: "Successfully uploaded a new beta build to TestFlight",
+      slack_url: ENV["SLACK_URL"],
+      channel: "#ios-deployments"
+    )
+  end
+
+  desc "Push a new release build to the App Store"
+  lane :release do
+    setup_ci if is_ci
+    
+    # Ensure we're on the right branch
+    ensure_git_branch(branch: 'main')
+    
+    # Ensure clean git status
+    ensure_git_status_clean
+    
+    # Increment version number
+    increment_version_number(
+      version_number: prompt(
+        text: "What version number do you want to release?",
+        default: "1.0.0"
+      ),
+      xcodeproj: "Runner.xcodeproj"
+    )
+    
+    # Increment build number
+    increment_build_number(
+      build_number: latest_testflight_build_number + 1,
+      xcodeproj: "Runner.xcodeproj"
+    )
+    
+    # Build the app
+    build_ios_app(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "app-store",
+      export_options: {
+        method: "app-store",
+        provisioningProfiles: {
+          "com.example.deploymentDemoApp" => "match AppStore com.example.deploymentDemoApp"
+        }
+      },
+      output_directory: "build/ios",
+      output_name: "DeploymentDemo.ipa",
+      clean: true,
+      archive_path: "build/ios/DeploymentDemo.xcarchive"
+    )
+    
+    # Upload to TestFlight first
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+      changelog: "Release build #{latest_testflight_build_number + 1}"
+    )
+    
+    # Submit for review
+    deliver(
+      submit_for_review: true,
+      automatic_release: false,
+      force: true,
+      skip_metadata: false,
+      skip_screenshots: false,
+      skip_binary_upload: false,
+      precheck_include_in_app_purchases: false,
+      submission_information: {
+        add_id_info_uses_idfa: false,
+        add_id_info_serves_ads: false,
+        add_id_info_tracks_install: false,
+        add_id_info_tracks_action: false,
+        export_compliance_uses_encryption: false,
+        export_compliance_is_exempt: false,
+        export_compliance_contains_proprietary_cryptography: false,
+        export_compliance_contains_third_party_cryptography: false,
+        export_compliance_platform: "ios",
+        export_compliance_compliance_required: false,
+        export_compliance_encryption_updated: false,
+        content_rights_contains_third_party_content: false,
+        content_rights_has_rights: false
+      }
+    )
+    
+    # Notify team
+    slack(
+      message: "Successfully submitted a new release to the App Store",
+      slack_url: ENV["SLACK_URL"],
+      channel: "#ios-deployments"
+    )
+  end
+
+  desc "Run tests"
+  lane :test do
+    scan(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      devices: ["iPhone 14 Pro"],
+      clean: true
+    )
+  end
+
+  desc "Setup code signing"
+  lane :setup_code_signing do
+    match(
+      type: "appstore",
+      app_identifier: ["com.example.deploymentDemoApp"],
+      team_id: ENV["TEAM_ID"],
+      readonly: true
+    )
+  end
+
+  desc "Update provisioning profiles"
+  lane :update_provisioning do
+    match(
+      type: "appstore",
+      app_identifier: ["com.example.deploymentDemoApp"],
+      team_id: ENV["TEAM_ID"],
+      force_for_new_devices: true
+    )
+  end
+
+  desc "Build and archive without uploading"
+  lane :build do
+    setup_ci if is_ci
+    
+    build_ios_app(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "app-store",
+      export_options: {
+        method: "app-store",
+        provisioningProfiles: {
+          "com.example.deploymentDemoApp" => "match AppStore com.example.deploymentDemoApp"
+        }
+      },
+      output_directory: "build/ios",
+      output_name: "DeploymentDemo.ipa",
+      clean: true,
+      archive_path: "build/ios/DeploymentDemo.xcarchive"
+    )
+  end
+
+  error do |lane, exception, options|
+    # This block is called, if an exception occurs while running a lane
+    slack(
+      message: "The lane #{lane} failed with error: #{exception}",
+      slack_url: ENV["SLACK_URL"],
+      channel: "#ios-deployments",
+      success: false
+    )
+  end
+end
+
+# ios/fastlane/Appfile
+# This file contains the app identifier and team ID
+
+app_identifier("com.example.deploymentDemoApp") # The bundle identifier of your app
+apple_id("your-apple-id@example.com") # Your Apple email address
+
+itc_team_id("123456789") # App Store Connect Team ID
+team_id("ABC123DEF4") # Developer Portal Team ID
+
+# ios/fastlane/Deliverfile
+# This file contains the deliver configuration
+
+# App Store Connect API Key
+api_key_path("path/to/AuthKey_XXXXXXXXXX.p8")
+api_key_id("XXXXXXXXXX")
+issuer_id("XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX")
+
+# App information
+app_identifier("com.example.deploymentDemoApp")
+username("your-apple-id@example.com")
+
+# Metadata
+metadata_path("./fastlane/metadata")
+
+# Screenshots
+screenshots_path("./fastlane/screenshots")
+
+# App Store Connect API
+api_key(
+  key_id: "XXXXXXXXXX",
+  issuer_id: "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX",
+  key_filepath: "./fastlane/AuthKey_XXXXXXXXXX.p8",
+  duration: 1200,
+  in_house: false
+)
+
+# ios/fastlane/Matchfile
+# This file contains the match configuration for code signing
+
+git_url("https://github.com/your-org/certificates.git")
+storage_mode("git")
+
+type("appstore") # The default type, can be: appstore, adhoc, development, enterprise
+
+app_identifier(["com.example.deploymentDemoApp"])
+team_id("ABC123DEF4")
+
+# For all available options run `fastlane match --help`
