@@ -323,6 +323,7 @@ void main() {
   // Anonymous functions (closures)
   processNumbers(numbers, (int x) => x + 10);
 }
+```
 
 ### Collections
 
@@ -457,7 +458,7 @@ void main() {
   lateName = 'Late Initialized'; // Must be set before use
   print('Late name: $lateName');
 }
-
+```
 ---
 
 ## 4. Object-Oriented Programming in Dart
@@ -728,7 +729,7 @@ void main() {
   String palindrome = 'A man, a plan, a canal: Panama';
   print('Is palindrome: ${palindrome.isPalindrome}');
 }
-
+```
 ---
 
 ## 5. Asynchronous Programming
@@ -923,7 +924,7 @@ void main() async {
   await Future.delayed(Duration(seconds: 1));
   controller.close(); // Close the stream
 }
-
+```
 ---
 
 ## 6. Mini Projects / Practice
@@ -1076,7 +1077,7 @@ void main() async {
   await processData();
   print('\nData processing completed!');
 }
-
+```
 ---
 
 ## 7. Comparison to Other Languages
