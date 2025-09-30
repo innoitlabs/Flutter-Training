@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../core/network/api_result.dart';
+import '../../core/network/api_result.dart';
 import 'post_model.dart';
 import 'posts_service.dart';
 import 'create_post_page.dart';
@@ -15,7 +15,6 @@ class PostsPage extends StatefulWidget {
 class _PostsPageState extends State<PostsPage> {
   final PostsService _postsService = PostsService();
   ApiResult<List<Post>> _postsResult = const ApiLoading();
-  bool _isRefreshing = false;
 
   @override
   void initState() {
@@ -28,11 +27,7 @@ class _PostsPageState extends State<PostsPage> {
     if (!mounted) return;
     
     setState(() {
-      if (forceRefresh) {
-        _isRefreshing = true;
-      } else {
-        _postsResult = const ApiLoading();
-      }
+      _postsResult = const ApiLoading();
     });
 
     final result = await _postsService.getPosts(forceRefresh: forceRefresh);
@@ -41,7 +36,6 @@ class _PostsPageState extends State<PostsPage> {
     
     setState(() {
       _postsResult = result;
-      _isRefreshing = false;
     });
   }
 
@@ -242,3 +236,4 @@ class _PostsPageState extends State<PostsPage> {
     );
   }
 }
+

@@ -79,3 +79,4 @@ lib/
 - ✅ Material 3 theming
 - ✅ Status code handling
 - ✅ Network error mapping
+

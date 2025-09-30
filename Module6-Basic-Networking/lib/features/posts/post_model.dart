@@ -94,3 +94,4 @@ class CreatePostRequest {
     return 'CreatePostRequest(title: $title, body: $body, userId: $userId)';
   }
 }
+

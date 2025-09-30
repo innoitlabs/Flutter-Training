@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../core/network/api_result.dart';
+import '../../core/network/api_result.dart';
 import 'post_model.dart';
 import 'posts_service.dart';
 
@@ -57,7 +57,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
     // Handle result
     switch (result) {
       case ApiSuccess():
-        final post = result.data!;
+        final post = result.data;
         Navigator.pop(context, post);
         break;
       case ApiError():
@@ -182,3 +182,4 @@ class _CreatePostPageState extends State<CreatePostPage> {
     );
   }
 }
+

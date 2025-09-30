@@ -40,7 +40,7 @@ class AppHttpClient {
         return ApiError.fromStatusCode(response.statusCode);
       }
     } on TimeoutException {
-      return const ApiError(
+      return ApiError(
         message: 'Request timed out. Please try again.',
         exception: TimeoutException('Request timed out'),
       );
@@ -81,7 +81,7 @@ class AppHttpClient {
         return ApiError.fromStatusCode(response.statusCode);
       }
     } on TimeoutException {
-      return const ApiError(
+      return ApiError(
         message: 'Request timed out. Please try again.',
         exception: TimeoutException('Request timed out'),
       );
@@ -113,3 +113,4 @@ class AppHttpClient {
     _client.close();
   }
 }
+

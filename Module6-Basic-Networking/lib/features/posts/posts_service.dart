@@ -1,7 +1,7 @@
 import 'dart:convert';
-import '../core/network/api_result.dart';
-import '../core/network/http_client.dart';
-import '../core/cache/memory_cache.dart';
+import '../../core/network/api_result.dart';
+import '../../core/network/http_client.dart';
+import '../../core/cache/memory_cache.dart';
 import 'post_model.dart';
 
 /// Service for handling posts-related API operations
@@ -145,10 +145,11 @@ extension ApiResultWhen<T> on ApiResult<T> {
     if (this is ApiSuccess<T>) {
       return success((this as ApiSuccess<T>).data);
     } else if (this is ApiError<T>) {
-      final error = this as ApiError<T>;
-      return error(error.message, error.statusCode, error.exception);
+      final apiError = this as ApiError<T>;
+      return error(apiError.message, apiError.statusCode, apiError.exception);
     } else {
       throw Exception('Unhandled ApiResult state');
     }
   }
 }
+

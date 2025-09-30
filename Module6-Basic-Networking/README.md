@@ -140,3 +140,4 @@ Add a search input with debounced fetch, cache per-query results, and show empty
 - All code is null-safe and compatible with Dart 3.6.1
 - Material 3 theming with ColorScheme.fromSeed
 - No deprecated APIs used
+
