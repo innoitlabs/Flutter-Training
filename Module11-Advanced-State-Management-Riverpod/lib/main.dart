@@ -25,3 +25,4 @@ class RiverpodHubApp extends ConsumerWidget {
     );
   }
 }
+

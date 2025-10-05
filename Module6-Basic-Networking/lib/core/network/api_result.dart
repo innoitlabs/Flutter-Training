@@ -90,3 +90,4 @@ extension ApiResultExtensions<T> on ApiResult<T> {
   String? get errorMessage => this is ApiError<T> ? (this as ApiError<T>).message : null;
 }
 
+

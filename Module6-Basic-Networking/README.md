@@ -141,3 +141,4 @@ Add a search input with debounced fetch, cache per-query results, and show empty
 - Material 3 theming with ColorScheme.fromSeed
 - No deprecated APIs used
 
+

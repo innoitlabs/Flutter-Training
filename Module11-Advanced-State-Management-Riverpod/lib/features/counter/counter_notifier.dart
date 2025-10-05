@@ -36,3 +36,4 @@ class CounterNotifier extends StateNotifier<int> {
   // Check if the current value is odd
   bool get isOdd => state.isOdd;
 }
+

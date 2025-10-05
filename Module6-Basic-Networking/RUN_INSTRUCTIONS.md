@@ -80,3 +80,4 @@ lib/
 - ✅ Status code handling
 - ✅ Network error mapping
 
+

@@ -67,3 +67,4 @@ class TodoStats {
     required this.active,
   });
 }
+

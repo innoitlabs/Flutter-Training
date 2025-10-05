@@ -132,3 +132,4 @@ class TodosNotifier extends StateNotifier<List<TodoModel>> {
     state = state.map((todo) => todo.copyWith(done: false)).toList();
   }
 }
+

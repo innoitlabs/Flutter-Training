@@ -55,3 +55,4 @@ class _AppScaffoldState extends ConsumerState<AppScaffold> {
     );
   }
 }
+

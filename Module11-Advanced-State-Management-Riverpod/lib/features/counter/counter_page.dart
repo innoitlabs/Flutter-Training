@@ -34,7 +34,7 @@ class CounterPage extends ConsumerWidget {
         title: const Text('Counter Examples'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -207,3 +207,4 @@ class CounterPage extends ConsumerWidget {
     );
   }
 }
+
